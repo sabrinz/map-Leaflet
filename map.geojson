@@ -1,0 +1,66 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "nama ": "Masjid Raudhatul Irfan"
+      },
+      "geometry": {
+        "coordinates": [
+          106.87309797655655,
+          -6.905927037358069
+        ],
+        "type": "Point"
+      },
+      "id": 1
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          [
+            106.87297386524097,
+            -6.9056016344718785
+          ],
+          [
+            106.87300131814385,
+            -6.905223715756861
+          ],
+          [
+            106.87302760820381,
+            -6.905048090695857
+          ],
+          [
+            106.87341775325888,
+            -6.905078079361971
+          ],
+          [
+            106.87343089818722,
+            -6.90541084365546
+          ],
+          [
+            106.87297411190508,
+            -6.9055821193041
+          ]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nama": "area kampus"
+      },
+      "geometry": {
+        "coordinates": [
+          106.87317597407389,
+          -6.905244634736988
+        ],
+        "type": "Point"
+      },
+      "id": 2
+    }
+  ]
+}
