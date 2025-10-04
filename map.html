@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Map leaflet </title>
+    <title>Map Web Mercator</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-    <h1> Fasilitas Ramah Disabilitas </h1>
-    <div id="map" style="background-color: rgb(3, 3, 92);height: 500px;">ini map</div>
-
+    <h1>Fasilitas Ramah Disabilitas</h1>
+    <div id="map" style="background-color: rgb(9, 27, 115); height: 500px;">ini mapnya</div>
     <script>
-        var map = L.map('map').setView([-6.9369223,106.8393673],13);
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        //tambahkan geojson ke map
-        fetch("map1.geojson")
+        var map = L.map('map').setView([-6.883182, 106.868460], 13);
+        var osm= L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        //tambhakan geojson ke map
+        fetch("map (2).geojson")
         .then(res => res.json())
         .then(data => {
         L.geoJSON(data, {onEachFeature: function(feature, layer){layer.bindPopup(feature.properties.nama)}}).addTo(map);
         });
     </script>
-
 </body>
 </html>
