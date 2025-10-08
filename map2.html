@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peta EPSG:4326 - Lokasi Fasilitas Ramah Disabilitas</title>
+  <title>Peta EPSG:4326 - Pemetaan Sebaran Apotek </title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
@@ -29,12 +29,12 @@
     }).addTo(map);
 
     // Tambahkan data GeoJSON (sama seperti di peta Mercator)
-    fetch("map (2).geojson")
+    fetch("map.geojson")
       .then(res => res.json())
       .then(data => {
         L.geoJSON(data, {
           onEachFeature: function (feature, layer) {
-            layer.bindPopup(feature.properties.nama);
+            layer.bindPopup(feature.properties.Nama);
           }
         }).addTo(map);
       });
