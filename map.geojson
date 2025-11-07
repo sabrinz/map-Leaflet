@@ -3,7 +3,11 @@
   "features": [
     {
       "type": "Feature",
-      "properties": { "Nama": "Apotek Kimia Farma" },
+      "properties": {
+        "Nama": "Apotek Kimia Farma",
+        "Kategori": "24 Jam",
+        "Alamat": "Jl. RE Martadinata No.15, Sukabumi"
+      },
       "geometry": {
         "type": "Point",
         "coordinates": [106.92776601306286, -6.91922594269721]
@@ -36,7 +40,11 @@
     },
     {
       "type": "Feature",
-      "properties": { "Nama": "Apotek Raja Alka Medika" },
+      "properties": {
+        "Nama": "Apotek Raja Alka Medika",
+        "Kategori": "Umum",
+        "Alamat": "Jl. Ahmad Yani No.10, Sukabumi"
+      },
       "geometry": {
         "type": "Point",
         "coordinates": [106.93320851873517, -6.91724021379197]
@@ -58,11 +66,16 @@
     },
     {
       "type": "Feature",
-      "properties": { "Nama": "Apotek Pananjung" },
+      "properties": {
+        "Nama": "Apotek Pananjung",
+        "Kategori": "Rumah Sakit",
+        "Alamat": "Jl. Surya Kencana No.22, Sukabumi"
+      },
       "geometry": {
         "type": "Point",
         "coordinates": [106.93337609504835, -6.917255225422224]
-      }
+      },
+      "id": 5
     },
     {
       "type": "Feature",
@@ -73,15 +86,17 @@
           [106.9333648660728, -6.917168251826624],
           [106.93343369733708, -6.9171953040316225],
           [106.93338530404924, -6.91731633946668],
-          [106.93331600297995, -6.917288820815983],
-          [106.93336483642071, -6.917167703054687],
-          [106.93338255406826, -6.917192753606713]
+          [106.93331600297995, -6.917288820815983]
         ]
       }
     },
     {
       "type": "Feature",
-      "properties": { "Nama": "Apotek Indo Medika" },
+      "properties": {
+        "Nama": "Apotek Indo Medika",
+        "Kategori": "Umum",
+        "Alamat": "Jl. Bhayangkara No.3, Sukabumi"
+      },
       "geometry": {
         "type": "Point",
         "coordinates": [106.93454946199813, -6.914508135866015]
@@ -96,25 +111,41 @@
           [106.93469602246205, -6.914561569687905],
           [106.93470639794418, -6.914436032749862],
           [106.93449758171965, -6.914416075535527],
-          [106.93447884515928, -6.914542256611668],
-          [106.93469544335323, -6.914563501382588],
-          [106.93468766138153, -6.914560282478291]
+          [106.93447884515928, -6.914542256611668]
         ]
       }
     },
     {
       "type": "Feature",
-      "properties": { "Nama": "Zona Kepadatan Apotek" },
+      "properties": {
+        "Nama": "Zona Kepadatan Apotek"
+      },
       "geometry": {
         "type": "Polygon",
-        "coordinates": [[
-          [106.9315, -6.9195],
-          [106.9350, -6.9195],
-          [106.9350, -6.9160],
-          [106.9315, -6.9160],
-          [106.9315, -6.9195]
-        ]]
-      }
+        "coordinates": [
+          [
+            [106.9315, -6.9195],
+            [106.935, -6.9195],
+            [106.935, -6.916],
+            [106.9315, -6.916],
+            [106.9315, -6.9195]
+          ]
+        ]
+      },
+      "id": 9
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Depo Farmasi Cattleya",
+        "Kategori": "24 Jam",
+        "Alamat": "Jl. RA Kosasih No.9, Sukabumi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.93465501472184, -6.91696696263115]
+      },
+      "id": 10
     }
   ]
 }

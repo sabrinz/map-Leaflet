@@ -18,18 +18,18 @@
     body {
       margin: 0;
       font-family: "Poppins", "Segoe UI", sans-serif;
-      background-color: #f8f9fa;
+      background-color: #eef2f7;
     }
 
     h1 {
       background: linear-gradient(90deg, #0b3c91, #1e6bd6);
-      color: white;
+      color: #fff;
       text-align: center;
-      padding: 14px 0;
+      padding: 16px 0;
       margin: 0;
-      font-size: 1.6rem;
-      letter-spacing: 1px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      font-size: 1.7rem;
+      letter-spacing: 0.8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     }
 
     #map {
@@ -38,6 +38,7 @@
       border-top: 2px solid #0b3c91;
     }
 
+    /* Tombol kembali */
     .back-btn {
       position: absolute;
       top: 15px;
@@ -47,93 +48,95 @@
       color: #0b3c91;
       border: none;
       font-weight: 500;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      padding: 8px 16px;
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
 
     .back-btn:hover {
       background: #0b3c91;
-      color: white;
+      color: #fff;
+      transform: translateY(-2px);
     }
 
-    .leaflet-control-layers {
-      background-color: rgba(255, 255, 255, 0.95) !important;
-      border-radius: 8px !important;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-      font-size: 0.9rem;
-    }
-
-    .leaflet-tooltip {
-      background-color: #0b3c91;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
+    /* Tombol lokasi */
     .locate-btn {
       position: absolute;
       top: 15px;
       right: 15px;
       z-index: 1000;
       background: #0b3c91;
-      color: white;
+      color: #fff;
       border: none;
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      transition: all 0.25s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     }
 
     .locate-btn:hover {
       background: #1e6bd6;
-      transform: scale(1.05);
+      transform: scale(1.07);
     }
 
-    /* Input pencarian apotek */
+    /* Kotak pencarian */
     .search-box {
       position: absolute;
-      top: 70px;
+      top: 75px;
       left: 15px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 8px;
-      padding: 6px 10px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .search-box input {
       border: none;
       outline: none;
       width: 200px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
 
-    /* Legenda peta */
+    /* Tombol download */
+    #download-btn {
+      z-index: 1000;
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      transition: 0.25s;
+    }
+
+    #download-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Legenda */
     .legend {
       position: absolute;
       bottom: 20px;
       right: 20px;
       background: rgba(255, 255, 255, 0.95);
-      padding: 10px 14px;
-      border-radius: 8px;
+      padding: 12px 16px;
+      border-radius: 10px;
       font-size: 0.9rem;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-      line-height: 1.4em;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      line-height: 1.5em;
     }
 
     .legend h6 {
-      margin-top: 0;
+      margin: 0 0 6px;
       font-weight: 600;
       color: #0b3c91;
     }
@@ -145,20 +148,43 @@
       margin-right: 8px;
       border-radius: 3px;
     }
+
+    /* Popup dan tooltip */
+    .leaflet-popup-content {
+      font-size: 0.9rem;
+    }
+
+    .leaflet-tooltip {
+      background-color: #0b3c91;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
   </style>
 </head>
 
 <body>
   <h1>🗺️ Peta Sebaran Apotek di Kota Sukabumi</h1>
+
+  <!-- Tombol Navigasi -->
   <a href="index.html" class="back-btn">← Kembali</a>
   <button id="locate-btn" class="locate-btn" title="Tampilkan Lokasi Saya">📍</button>
 
   <!-- Search box -->
   <div class="search-box">
-    <input type="text" id="search-apotek" placeholder="🔎 Cari apotek..." />
+    <span>🔎</span>
+    <input type="text" id="search-apotek" placeholder="Cari apotek..." />
   </div>
 
   <div id="map"></div>
+
+  <!-- Tombol download -->
+  <button id="download-btn" class="btn btn-success position-absolute bottom-0 start-0 m-3">
+    ⬇️ Unduh Data
+  </button>
 
   <!-- Legenda -->
   <div class="legend">
@@ -183,6 +209,11 @@
       { attribution: "Tiles © Esri" }
     );
 
+    var topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+      maxZoom: 17,
+      attribution: "© OpenTopoMap contributors"
+    });
+
     // Layer groups
     var markerLayer = L.layerGroup();
     var polylineLayer = L.layerGroup();
@@ -191,19 +222,18 @@
     // Icon apotek
     var apotekIcon = L.icon({
       iconUrl: "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
       popupAnchor: [0, -28]
     });
 
-    // Simpan data apotek untuk pencarian
     var apotekData = [];
 
     // Muat GeoJSON
     fetch("map.geojson")
       .then(res => res.json())
       .then(data => {
-        L.geoJSON(data, {
+        const geojson = L.geoJSON(data, {
           pointToLayer: (feature, latlng) => L.marker(latlng, { icon: apotekIcon }),
           style: feature => {
             if (feature.geometry.type === "LineString")
@@ -216,11 +246,19 @@
             const coords = feature.geometry.coordinates;
             layer.bindTooltip(nama, { direction: "top", offset: [0, -15] });
             layer.bindPopup(`
-              <div style="text-align:center">
-                <h6 style="margin-bottom:5px;color:#0b3c91">${nama}</h6>
+              <div style="text-align:center; line-height:1.4;">
+                <h6 style="margin-bottom:5px;color:#0b3c91;font-weight:600">${nama}</h6>
+                <p style="margin:2px 0;"><b>Alamat:</b> ${feature.properties.Alamat || "Tidak tersedia"}</p>
+                <p style="margin:2px 0;"><b>Jam Buka:</b> ${feature.properties.Jam || "Tidak diketahui"}</p>
                 <small><b>Koordinat:</b><br>${coords.join(", ")}</small>
               </div>
             `);
+
+            // Efek highlight saat hover
+            layer.on({
+              mouseover: e => e.target.setStyle({ weight: 4, color: "#FFD700", fillOpacity: 0.7 }),
+              mouseout: e => geojson.resetStyle(e.target)
+            });
 
             if (feature.geometry.type === "Point") {
               markerLayer.addLayer(layer);
@@ -231,10 +269,10 @@
           }
         });
 
-        // Pencarian global (alamat)
+        // Tambah geocoder (pencarian global)
         L.Control.geocoder({
           defaultMarkGeocode: false,
-          placeholder: "Cari lokasi di peta...",
+          placeholder: "Cari lokasi di peta..."
         })
         .on("markgeocode", function(e) {
           map.fitBounds(e.geocode.bbox);
@@ -247,7 +285,6 @@
     document.getElementById("search-apotek").addEventListener("keyup", function (e) {
       const query = e.target.value.toLowerCase().trim();
       if (!query) return;
-
       const found = apotekData.find(a => a.name.includes(query));
       if (found) {
         map.setView(found.layer.getLatLng(), 17);
@@ -261,7 +298,6 @@
         alert("Browser tidak mendukung geolokasi!");
         return;
       }
-
       navigator.geolocation.getCurrentPosition(
         pos => {
           const { latitude, longitude } = pos.coords;
@@ -272,7 +308,6 @@
               iconAnchor: [14, 28],
             }),
           }).addTo(map);
-
           userMarker.bindPopup("<b>Lokasi Anda Saat Ini</b>").openPopup();
           map.setView([latitude, longitude], 16);
         },
@@ -280,12 +315,35 @@
       );
     });
 
+    // Tombol download GeoJSON
+    document.getElementById("download-btn").addEventListener("click", () => {
+      fetch("map.geojson")
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "data_apotek_sukabumi.geojson";
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+    });
+
     // Layer control
     L.control.layers(
-      { "🌍 OpenStreetMap": osm, "🛰️ Satellite (ESRI)": satellite },
+      { "🌍 OpenStreetMap": osm, "🛰️ Satellite (ESRI)": satellite, "⛰️ Topographic": topo },
       { "🏥 Titik Apotek": markerLayer, "🛣️ Jalur": polylineLayer, "📍 Area": polygonLayer },
       { collapsed: false }
     ).addTo(map);
+
+    // Skala & klik koordinat
+    L.control.scale({ position: 'bottomleft' }).addTo(map);
+    map.on('click', function(e) {
+      L.popup()
+        .setLatLng(e.latlng)
+        .setContent("📍 Koordinat: " + e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5))
+        .openOn(map);
+    });
   </script>
 </body>
 </html>
