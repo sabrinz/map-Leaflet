@@ -146,6 +146,94 @@
         "coordinates": [106.93465501472184, -6.91696696263115]
       },
       "id": 10
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Sejahtera",
+        "Kategori": "Umum",
+        "Alamat": "Jl. Pelabuhan II No.45, Sukabumi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9205, -6.9231]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Murni",
+        "Kategori": "Umum",
+        "Alamat": "Jl. Siliwangi No.120, Sukabumi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9250, -6.9155]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Alun-Alun",
+        "Kategori": "Umum",
+        "Alamat": "Dekat Alun-Alun Kota"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9268, -6.9210]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Cisaat",
+        "Kategori": "Umum",
+        "Alamat": "Jl. Raya Cisaat KM 5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.8900, -6.9200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Bhakti Farma",
+        "Kategori": "24 Jam",
+        "Alamat": "Jl. Selabintana No.30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9310, -6.9180]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Apotek Permata Hati",
+        "Kategori": "Rumah Sakit",
+        "Alamat": "Jl. Veteran No.11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9325, -6.9190]
+      }
+    },
+
+    <!-- ----------- FEATURE API BARU ------------ -->
+    {
+      "type": "Feature",
+      "properties": {
+        "Nama": "Weather API Layer",
+        "Kategori": "API",
+        "Sumber": "Open-Meteo API",
+        "Keterangan": "Layer cuaca realtime ditampilkan di peta Leaflet"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.9260, -6.9185]
+      }
     }
+    <!-- ------------------------------------------ -->
   ]
 }

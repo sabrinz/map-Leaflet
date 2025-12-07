@@ -3,102 +3,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Peta Sebaran Apotek di Kota Sukabumi</title>
+  <title>Peta Sebaran Apotek - Analisis GIS Kota Sukabumi</title>
 
-  <!-- Leaflet & Bootstrap -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- Plugin Geocoder -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
   <style>
+    /* 1. Global & Header Styling */
     body {
       margin: 0;
       font-family: "Poppins", "Segoe UI", sans-serif;
-      background-color: #eef2f7;
+      background-color: #f8f9fa;
     }
 
     h1 {
       background: linear-gradient(90deg, #0b3c91, #1e6bd6);
       color: #fff;
       text-align: center;
-      padding: 16px 0;
+      padding: 18px 0;
       margin: 0;
-      font-size: 1.7rem;
-      letter-spacing: 0.8px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     #map {
-      height: 92vh;
+      height: calc(100vh - 66px);
       width: 100%;
       border-top: 2px solid #0b3c91;
     }
 
-    /* Tombol kembali */
-    .back-btn {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.9);
-      color: #0b3c91;
-      border: none;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 10px;
-      transition: all 0.25s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    }
-
-    .back-btn:hover {
-      background: #0b3c91;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    /* Tombol lokasi */
+    /* 2. Custom Control Styling */
     .locate-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      top: 10px;
+      left: 60px;
       z-index: 1000;
       background: #0b3c91;
       color: #fff;
       border: none;
-      border-radius: 50%;
-      width: 46px;
-      height: 46px;
+      border-radius: 8px;
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.25s;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
     }
 
     .locate-btn:hover {
       background: #1e6bd6;
-      transform: scale(1.07);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     }
 
-    /* Kotak pencarian */
     .search-box {
       position: absolute;
-      top: 75px;
-      left: 15px;
+      top: 65px;
+      left: 10px;
       z-index: 1000;
       background: #fff;
-      border-radius: 10px;
-      padding: 8px 12px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      padding: 6px 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .search-box input {
@@ -106,92 +91,171 @@
       outline: none;
       width: 200px;
       font-size: 0.95rem;
+      padding: 2px 0;
     }
 
-    /* Tombol download */
     #download-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
       z-index: 1000;
       font-size: 0.9rem;
       padding: 8px 14px;
       border-radius: 8px;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-      transition: 0.25s;
+      transition: 0.3s;
+      background-color: #28a745 !important;
+      border-color: #28a745 !important;
     }
 
     #download-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.02);
+      opacity: 0.9;
     }
 
-    /* Legenda */
+    /* API Cuaca button */
+    #api-cuaca-btn {
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      z-index: 1000;
+      font-size: 0.85rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #0b3c91;
+      color: white;
+      border: none;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    #api-cuaca-btn:hover { background:#1e6bd6; transform: translateY(-1px); }
+
+    /* 3. Legenda Styling */
     .legend {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 12px 16px;
-      border-radius: 10px;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.98);
+      padding: 14px 18px;
+      border-radius: 12px;
       font-size: 0.9rem;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-      line-height: 1.5em;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      line-height: 1.6em;
+      z-index: 1000;
     }
 
     .legend h6 {
-      margin: 0 0 6px;
-      font-weight: 600;
+      margin: 0 0 8px;
+      font-weight: 700;
       color: #0b3c91;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
     }
 
     .legend i {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       float: left;
-      margin-right: 8px;
-      border-radius: 3px;
+      margin-right: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    
+    .legend img {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 10px;
+      vertical-align: middle;
     }
 
-    /* Popup dan tooltip */
-    .leaflet-popup-content {
-      font-size: 0.9rem;
+    /* 4. Leaflet Plugin/Popup/Tooltip Styling */
+    .leaflet-control-layers {
+      border-radius: 8px !important;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .leaflet-control-container .leaflet-control-geocoder {
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 10px;
     }
 
     .leaflet-tooltip {
       background-color: #0b3c91;
       color: #fff;
       border: none;
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 0.85rem;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
       font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+      .search-box {
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 300px;
+      }
+      .locate-btn {
+        top: 60px;
+        left: auto;
+        right: 10px;
+      }
+      #download-btn {
+        top: 12px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+      .legend {
+        bottom: 5px;
+        right: 5px;
+        padding: 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* weather small icons */
+    .weather-divicon { font-weight:700; color:#fff; text-align:center; }
+    .cuaca-emoji { font-size:22px; text-align:center; }
   </style>
 </head>
 
 <body>
   <h1>🗺️ Peta Sebaran Apotek di Kota Sukabumi</h1>
 
-  <!-- Tombol Navigasi -->
-  <a href="index.html" class="back-btn">← Kembali</a>
-  <button id="locate-btn" class="locate-btn" title="Tampilkan Lokasi Saya">📍</button>
+  <button id="locate-btn" class="locate-btn" title="Tampilkan Lokasi Saya"><i class="fas fa-location-arrow"></i></button>
 
-  <!-- Search box -->
+  <button id="download-btn" class="btn position-absolute">
+    <i class="fas fa-download"></i> Unduh Data
+  </button>
+  <!-- tombol API cuaca (ditambahkan) -->
+  <button id="api-cuaca-btn" title="Muat Layer Cuaca (Open-Meteo)"><i class="fas fa-cloud"></i> API Cuaca</button>
+  
   <div class="search-box">
-    <span>🔎</span>
+    <i class="fas fa-search" style="color:#0b3c91;"></i>
     <input type="text" id="search-apotek" placeholder="Cari apotek..." />
   </div>
 
   <div id="map"></div>
 
-  <!-- Tombol download -->
-  <button id="download-btn" class="btn btn-success position-absolute bottom-0 start-0 m-3">
-    ⬇️ Unduh Data
-  </button>
-
-  <!-- Legenda -->
   <div class="legend">
     <h6>Legenda</h6>
     <div><i style="background:#28a745;"></i> Area (Polygon)</div>
     <div><i style="background:#007bff;"></i> Jalur (Polyline)</div>
-    <div><img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" width="16" style="margin-right:8px;"> Titik Apotek</div>
+    <div><i style="background:#ffa500; border-color: #ff8c00;"></i> Buffer 500m</div> 
+    <div><img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" alt="Apotek Icon"> Titik Apotek</div>
+    <div style="clear:both"></div>
+    <small style="color:#6c757d; display:block; margin-top:10px">
+      <i class="fas fa-info-circle"></i> Gunakan Layer Control (kanan atas) untuk melihat analisis.
+    </small>
   </div>
 
   <script>
@@ -214,10 +278,30 @@
       attribution: "© OpenTopoMap contributors"
     });
 
-    // Layer groups
-    var markerLayer = L.layerGroup();
+    // Layer groups (Original)
     var polylineLayer = L.layerGroup();
     var polygonLayer = L.layerGroup();
+
+    // BARU: Marker Clustering Layer
+    var clusterLayer = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true
+    });
+    
+    // BARU: Individual Buffer Layer (Analisis Kedekatan)
+    var individualBufferLayer = L.layerGroup();
+
+    // >>> API ADDED: Layer untuk hasil API Cuaca
+    var weatherLayer = L.layerGroup();
+    // >>> API ADDED: layer marker untuk reverse-geocoding (jika ingin nanti) - disiapkan tapi tidak dipanggil
+    var apiLayer = L.layerGroup();
+
+    // Layer groups (Analysis)
+    var heatLayer = null;
+    var centroidLayer = L.layerGroup();
+    var serviceAreaLayer = L.layerGroup();
+    var densityZoneLayer = L.layerGroup();
 
     // Icon apotek
     var apotekIcon = L.icon({
@@ -227,49 +311,258 @@
       popupAnchor: [0, -28]
     });
 
-    var apotekData = [];
+    var apotekData = []; // { name, layer }
 
-    // Muat GeoJSON
+    // Utility: ambil weather dari Open-Meteo
+    async function getWeather(lat, lon) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FJakarta`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const j = await res.json();
+        return j.current_weather || null;
+      } catch (err) {
+        console.warn("getWeather error:", err);
+        return null;
+      }
+    }
+
+    // Membuat icon cuaca kecil (menampilkan suhu)
+    function makeWeatherIcon(tempC) {
+      const color = tempC >= 30 ? "#ff5722" : tempC >= 25 ? "#ff9800" : "#4fc3f7";
+      const html = `<div style="background:${color};color:#fff;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:700;">${Math.round(tempC)}°C</div>`;
+      return L.divIcon({ html, className: "weather-divicon", iconSize: [46, 18], iconAnchor: [23, -10] });
+    }
+
+    // Ambil simbol teks untuk weathercode
+    function getWeatherText(code) {
+      const icons = {
+        0: "☀️ Cerah",
+        1: "🌤️ Mostly Clear",
+        2: "⛅ Berawan Sebagian",
+        3: "☁️ Mendung",
+        45: "🌫️ Kabut",
+        48: "🌫️ Kabut Beku",
+        51: "🌦️ Gerimis Ringan",
+        53: "🌧️ Gerimis Sedang",
+        55: "🌧️ Gerimis Lebat",
+        61: "🌦️ Hujan Ringan",
+        63: "🌧️ Hujan Sedang",
+        65: "🌧️ Hujan Lebat",
+        66: "🌨️ Hujan Membeku",
+        67: "🌨️ Freezing Rain",
+        71: "❄️ Salju Ringan",
+        73: "❄️ Salju Sedang",
+        75: "❄️ Salju Lebat",
+        80: "🌦️ Hujan Lokal",
+        81: "🌧️ Hujan Lebat Lokal",
+        82: "⛈️ Hujan Ekstrem",
+        95: "⛈️ Badai Petir",
+        96: "⛈️ Petir + Hujan Es",
+        99: "🌩️ Badai Petir Ekstrem"
+      };
+      return icons[code] || "❔ Tidak Diketahui";
+    }
+
+    // Muat GeoJSON (nama file: map.geojson)
     fetch("map.geojson")
       .then(res => res.json())
       .then(data => {
         const geojson = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: apotekIcon }),
+          pointToLayer: (feature, latlng) => {
+            // 1. BUAT MARKER
+            const marker = L.marker(latlng, { icon: apotekIcon });
+            
+            // 2. BUAT BUFFER 500m UNTUK SETIAP APOTEK (ANALISIS KEDEKATAN)
+            L.circle(latlng, {
+                radius: 500, // 500 meter
+                color: '#ff8c00', // Oranye
+                fillColor: '#ffa500',
+                fillOpacity: 0.15,
+                weight: 1 
+            })
+            .bindPopup(`Area Layanan 500m: <b>${feature.properties.Nama || 'Apotek'}</b>`)
+            .addTo(individualBufferLayer);
+            
+            return marker; // Kembalikan marker untuk ditambahkan ke layer
+          },
           style: feature => {
             if (feature.geometry.type === "LineString")
               return { color: "#007bff", weight: 3, dashArray: "5, 5" };
             if (feature.geometry.type === "Polygon")
-              return { color: "#28a745", fillOpacity: 0.4 };
+              return { color: "#28a745", fillOpacity: 0.4, weight: 1.5 };
           },
           onEachFeature: (feature, layer) => {
             const nama = feature.properties["Nama"] || feature.properties["Nama "] || "Apotek";
-            const coords = feature.geometry.coordinates;
             layer.bindTooltip(nama, { direction: "top", offset: [0, -15] });
-            layer.bindPopup(`
-              <div style="text-align:center; line-height:1.4;">
-                <h6 style="margin-bottom:5px;color:#0b3c91;font-weight:600">${nama}</h6>
-                <p style="margin:2px 0;"><b>Alamat:</b> ${feature.properties.Alamat || "Tidak tersedia"}</p>
-                <p style="margin:2px 0;"><b>Jam Buka:</b> ${feature.properties.Jam || "Tidak diketahui"}</p>
-                <small><b>Koordinat:</b><br>${coords.join(", ")}</small>
-              </div>
-            `);
-
-            // Efek highlight saat hover
-            layer.on({
-              mouseover: e => e.target.setStyle({ weight: 4, color: "#FFD700", fillOpacity: 0.7 }),
-              mouseout: e => geojson.resetStyle(e.target)
-            });
 
             if (feature.geometry.type === "Point") {
-              markerLayer.addLayer(layer);
+              const latlng = layer.getLatLng();
+
+              // --- NEW: bind click event to fetch weather and show popup (CUACA OTOMATIS) ---
+              layer.on("click", async function () {
+                // lightly show a loading popup
+                layer.bindPopup(`<div style="text-align:center"><b>${nama}</b><br><i>Memuat data cuaca...</i></div>`).openPopup();
+
+                const weather = await getWeather(latlng.lat, latlng.lng);
+
+                let cuacaHTML = "<i>Tidak tersedia</i>";
+                let temp = null;
+                let weatherText = "";
+
+                if (weather) {
+                  temp = weather.temperature;
+                  weatherText = getWeatherText(weather.weathercode);
+                  cuacaHTML = `
+                    ${weatherText}<br>
+                    🌡️ Suhu: <b>${weather.temperature}°C</b><br>
+                    💨 Angin: <b>${weather.windspeed} m/s</b><br>
+                    🧭 Arah Angin: <b>${weather.winddirection}°</b><br>
+                    🕒 Waktu: ${weather.time}
+                  `;
+                }
+
+                const popupHTML = `
+                  <div style="text-align:center; line-height:1.4;">
+                    <h6 style="margin-bottom:5px;color:#0b3c91;font-weight:600">${nama}</h6>
+                    <p style="margin:2px 0;"><b>Alamat:</b> ${feature.properties.Alamat || "Tidak tersedia"}</p>
+                    <p style="margin:2px 0;"><b>Jam Buka:</b> ${feature.properties.Jam || "Tidak diketahui"}</p>
+                    <hr>
+                    <b>☁️ Cuaca Saat Ini</b><br>
+                    ${cuacaHTML}
+                    <hr>
+                    <small style="color:#6c757d"><b>Koordinat:</b><br>${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}</small>
+                  </div>
+                `;
+
+                // update popup content
+                layer.bindPopup(popupHTML).openPopup();
+
+                // also add small weather icons next to the marker (optional)
+                // remove old weather markers for this point by filtering (simple approach)
+                // create temp icon markers and add to weatherLayer so user can toggle the layer
+                if (temp !== null) {
+                  const wIcon = makeWeatherIcon(temp);
+                  const wMarker = L.marker([latlng.lat + 0.00008, latlng.lng], { icon: wIcon });
+                  const emoji = getWeatherText(weather.weathercode).split(" ")[0] || "❔";
+                  const emojiMarker = L.marker([latlng.lat + 0.00024, latlng.lng], {
+                    icon: L.divIcon({ html: `<div style="font-size:20px">${emoji}</div>`, className: 'cuaca-emoji' })
+                  });
+
+                  // add to weatherLayer and keep (user can toggle via LayerControl)
+                  weatherLayer.addLayer(wMarker);
+                  weatherLayer.addLayer(emojiMarker);
+                }
+              });
+
+              // push to apotekData for search functionality
+              clusterLayer.addLayer(layer);
               apotekData.push({ name: nama.toLowerCase(), layer });
             }
             if (feature.geometry.type === "LineString") polylineLayer.addLayer(layer);
             if (feature.geometry.type === "Polygon") polygonLayer.addLayer(layer);
+
+            // Efek highlight saat hover
+            layer.on({
+              mouseover: e => {
+                try {
+                  e.target.setStyle && e.target.setStyle({ weight: 4, color: "#FFD700", fillOpacity: 0.7 });
+                } catch (err) {}
+              },
+              mouseout: e => {
+                try { geojson.resetStyle && geojson.resetStyle(e.target); } catch (err) {}
+              }
+            });
           }
         });
 
-        // Tambah geocoder (pencarian global)
+        // Ganti markerLayer lama dengan clusterLayer
+        clusterLayer.addTo(map);
+        polylineLayer.addTo(map);
+        polygonLayer.addTo(map);
+
+        // -------------------------
+        // ANALYSIS: heatmap, centroid, service area, choropleth
+        // -------------------------
+        setTimeout(() => {
+          const markerPoints = [];
+          clusterLayer.eachLayer(m => { // Mengambil titik dari Cluster Layer
+            if (m.getLatLng) markerPoints.push(m.getLatLng());
+          });
+
+          if (markerPoints.length > 0) {
+            // 1) Heatmap
+            const heatPoints = markerPoints.map(p => [p.lat, p.lng, 0.7]);
+            heatLayer = L.heatLayer(heatPoints, { radius: 30, blur: 20, maxZoom: 15 });
+
+            // 2) Centroid
+            let sumLat = 0, sumLng = 0;
+            markerPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
+            const centroid = { lat: sumLat / markerPoints.length, lng: sumLng / markerPoints.length };
+
+            const centroidIcon = L.icon({
+              iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32]
+            });
+            L.marker([centroid.lat, centroid.lng], { icon: centroidIcon })
+              .bindPopup(`<b>Pusat Kepadatan Apotek</b><br>${centroid.lat.toFixed(6)}, ${centroid.lng.toFixed(6)}`).addTo(centroidLayer);
+
+            // 3) Service area 1 km circle
+            L.circle([centroid.lat, centroid.lng], {
+              radius: 1000,
+              color: "#00c853",
+              fillColor: "#69f0ae",
+              fillOpacity: 0.2
+            }).bindPopup("Radius 1 km dari pusat kepadatan").addTo(serviceAreaLayer);
+
+            // 4) Zona Kepadatan
+            const zoneSize = 0.004;
+            L.polygon([
+              [centroid.lat + zoneSize, centroid.lng - zoneSize],
+              [centroid.lat + zoneSize, centroid.lng + zoneSize],
+              [centroid.lat - zoneSize, centroid.lng + zoneSize],
+              [centroid.lat - zoneSize, centroid.lng - zoneSize]
+            ], {
+              color: "#d50000",
+              fillColor: "#ff1744",
+              fillOpacity: 0.3
+            }).bindPopup("<b>Zona Kepadatan (automatis)</b>").addTo(densityZoneLayer);
+
+            // Tampilkan Heatmap by default
+            heatLayer.addTo(map);
+          }
+
+          // -------------
+          // LAYER CONTROL
+          // -------------
+          var baseMaps = {
+            "🌍 OpenStreetMap": osm,
+            "🛰️ Satellite (ESRI)": satellite,
+            "⛰️ Topographic": topo
+          };
+
+          var overlays = {
+            "🏥 Titik Apotek (Clustered)": clusterLayer,
+            "🛣️ Jalur": polylineLayer,
+            "🗺️ Area (Polygon)": polygonLayer
+          };
+          
+          // Tambahkan layer analisis
+          if (individualBufferLayer) overlays["🟠 Buffer 500m (Per Apotek)"] = individualBufferLayer;
+          if (heatLayer) overlays["🔥 Heatmap Kepadatan (On)"] = heatLayer;
+          if (centroidLayer) overlays["📌 Centroid Apotek (Analisis)"] = centroidLayer;
+          if (serviceAreaLayer) overlays["🟢 Service Area 1 km"] = serviceAreaLayer;
+          if (densityZoneLayer) overlays["🟥 Zona Kepadatan"] = densityZoneLayer;
+
+          // >>> tambahkan weatherLayer & apiLayer ke overlays (jika ada)
+          overlays["🌤️ Layer Cuaca (Open-Meteo)"] = weatherLayer;
+          overlays["🌐 Data API Lokasi (Reverse)"] = apiLayer;
+
+          L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(map);
+        }, 300);
+
+        // Add geocoder
         L.Control.geocoder({
           defaultMarkGeocode: false,
           placeholder: "Cari lokasi di peta..."
@@ -278,10 +571,11 @@
           map.fitBounds(e.geocode.bbox);
         })
         .addTo(map);
+
       })
       .catch(err => console.error("Gagal memuat GeoJSON:", err));
 
-    // Pencarian apotek lokal
+    // Pencarian apotek lokal (search box)
     document.getElementById("search-apotek").addEventListener("keyup", function (e) {
       const query = e.target.value.toLowerCase().trim();
       if (!query) return;
@@ -301,13 +595,12 @@
       navigator.geolocation.getCurrentPosition(
         pos => {
           const { latitude, longitude } = pos.coords;
-          const userMarker = L.marker([latitude, longitude], {
-            icon: L.icon({
-              iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
-              iconSize: [28, 28],
-              iconAnchor: [14, 28],
-            }),
-          }).addTo(map);
+          const userIcon = L.icon({
+            iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
+            iconSize: [28, 28],
+            iconAnchor: [14, 28],
+          });
+          const userMarker = L.marker([latitude, longitude], { icon: userIcon }).addTo(map);
           userMarker.bindPopup("<b>Lokasi Anda Saat Ini</b>").openPopup();
           map.setView([latitude, longitude], 16);
         },
@@ -329,12 +622,65 @@
         });
     });
 
-    // Layer control
-    L.control.layers(
-      { "🌍 OpenStreetMap": osm, "🛰️ Satellite (ESRI)": satellite, "⛰️ Topographic": topo },
-      { "🏥 Titik Apotek": markerLayer, "🛣️ Jalur": polylineLayer, "📍 Area": polygonLayer },
-      { collapsed: false }
-    ).addTo(map);
+    // =====================================
+    // >>> API Cuaca: Open-Meteo (current_weather)
+    // =====================================
+
+    // Tambah layer cuaca: butuh apotekData terisi
+    async function addWeatherLayer() {
+      weatherLayer.clearLayers();
+      if (!apotekData || apotekData.length === 0) {
+        alert("Data apotek belum siap. Tunggu sebentar lalu coba lagi.");
+        return;
+      }
+
+      // batasi request: small delay antar request agar tidak membebani API
+      for (let i = 0; i < apotekData.length; i++) {
+        const item = apotekData[i];
+        const marker = item.layer;
+        if (!marker || !marker.getLatLng) continue;
+        const latlng = marker.getLatLng();
+
+        const weather = await getWeather(latlng.lat, latlng.lng);
+        if (!weather) continue;
+
+        // buat marker suhu (divIcon) dan popup detail
+        const wIcon = makeWeatherIcon(weather.temperature);
+        const wMarker = L.marker([latlng.lat + 0.00008, latlng.lng], { icon: wIcon }); // sedikit offset agar tidak menimpa popup apotek
+
+        const popupHtml = `
+          <div style="font-size:13px">
+            <b>Cuaca Sekarang</b><br>
+            Lokasi: <b>${item.name}</b><br>
+            Suhu: <b>${weather.temperature} °C</b><br>
+            Kecepatan Angin: <b>${weather.windspeed} m/s</b><br>
+            Arah Angin: <b>${weather.winddirection}°</b><br>
+            Time: ${weather.time}
+          </div>
+        `;
+        wMarker.bindPopup(popupHtml);
+        weatherLayer.addLayer(wMarker);
+
+        // emoji icon
+        const emoji = getWeatherText(weather.weathercode).split(" ")[0] || "❔";
+        const emojiMarker = L.marker([latlng.lat + 0.00024, latlng.lng], {
+          icon: L.divIcon({ html: `<div style="font-size:18px">${emoji}</div>`, className: 'cuaca-emoji' })
+        });
+        weatherLayer.addLayer(emojiMarker);
+
+        // kecilkan delay antar request (200 ms)
+        await new Promise(r => setTimeout(r, 200));
+      }
+
+      // tambahkan ke peta (jika overlay aktif, LayerControl akan mengatur)
+      weatherLayer.addTo(map);
+      alert("Layer cuaca dimuat. Gunakan Layer Control untuk on/off.");
+    }
+
+    // Tombol API Cuaca => panggil addWeatherLayer()
+    document.getElementById("api-cuaca-btn").addEventListener("click", () => {
+      addWeatherLayer();
+    });
 
     // Skala & klik koordinat
     L.control.scale({ position: 'bottomleft' }).addTo(map);
@@ -344,6 +690,6 @@
         .setContent("📍 Koordinat: " + e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5))
         .openOn(map);
     });
-  </script>
+</script>
 </body>
 </html>
