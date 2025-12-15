@@ -219,21 +219,18 @@
         "coordinates": [106.9325, -6.9190]
       }
     },
-
-    <!-- ----------- FEATURE API BARU ------------ -->
     {
       "type": "Feature",
       "properties": {
         "Nama": "Weather API Layer",
         "Kategori": "API",
-        "Sumber": "Open-Meteo API",
-        "Keterangan": "Layer cuaca realtime ditampilkan di peta Leaflet"
+        "Sumber": "Open-Meteo",
+        "Keterangan": "Pos dummy untuk layer cuaca"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [106.9260, -6.9185]
       }
     }
-    <!-- ------------------------------------------ -->
   ]
 }

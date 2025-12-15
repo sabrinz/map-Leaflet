@@ -3,500 +3,602 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Peta Sebaran Apotek - Analisis GIS Kota Sukabumi</title>
+  <title>Peta Sebaran Apotek - Analisis GIS Kota Sukabumi (Final)</title>
 
+  <!-- External libs (kept as in original) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
   <style>
-    /* 1. Global & Header Styling */
-    body {
-      margin: 0;
-      font-family: "Poppins", "Segoe UI", sans-serif;
-      background-color: #f8f9fa;
+    /* --- Baseline / Premium UI --- */
+    :root{
+      --brand-1: #0b3c91;
+      --brand-2: #1e6bd6;
+      --accent: #28a745;
+      --glass: rgba(255,255,255,0.9);
+      --muted: #6c757d;
+      --card-shadow: 0 8px 28px rgba(11,60,145,0.12);
+      --rounded: 12px;
     }
-
-    h1 {
-      background: linear-gradient(90deg, #0b3c91, #1e6bd6);
-      color: #fff;
-      text-align: center;
-      padding: 18px 0;
-      margin: 0;
-      font-size: 1.8rem;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    html,body{height:100%;margin:0;font-family:"Poppins","Segoe UI",system-ui,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f6f9ff 0%, #f8f9fa 40%);}
+    h1{
+      margin:0;padding:18px 14px;font-size:1.4rem;color:white;
+      background:linear-gradient(90deg,var(--brand-1),var(--brand-2));
+      letter-spacing:1px;box-shadow:var(--card-shadow);
+      display:flex;align-items:center;gap:12px;
     }
+    #app-bar { display:flex; align-items:center; justify-content:space-between; padding:0 10px; }
 
-    #map {
-      height: calc(100vh - 66px);
-      width: 100%;
-      border-top: 2px solid #0b3c91;
+    #map { height: calc(100vh - 66px); width:100%; border-top:2px solid var(--brand-1); box-shadow: 0 12px 40px rgba(11,60,145,0.06); }
+
+    /* toolbar buttons */
+    .toolbar {
+      position:absolute; top:12px; left:12px; z-index:1000; display:flex; gap:8px; align-items:center;
     }
-
-    /* 2. Custom Control Styling (Tombol/Kotak) */
-
-    .locate-btn {
-      position: absolute;
-      top: 10px;
-      left: 60px;
-      z-index: 1000;
-      background: #0b3c91;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    .tool-btn {
+      background:var(--glass); border:none; padding:8px 10px; border-radius:10px; box-shadow:0 6px 20px rgba(11,60,145,0.06);
+      display:flex; gap:8px; align-items:center; cursor:pointer; transition:all .18s; font-weight:600; color:var(--brand-1);
     }
-
-    .locate-btn:hover {
-      background: #1e6bd6;
-      transform: translateY(-1px);
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    .tool-btn:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(11,60,145,0.12); }
+    .round-btn {
+      width:44px;height:44px;border-radius:10px;display:flex; align-items:center; justify-content:center; font-size:1.05rem;
     }
 
     .search-box {
-      position: absolute;
-      top: 65px;
-      left: 10px;
-      z-index: 1000;
-      background: #fff;
-      border-radius: 8px;
-      padding: 6px 10px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      position:absolute; top:62px; left:12px; z-index:1000; display:flex; align-items:center;
+      background:var(--glass); border-radius:12px; padding:8px 10px; box-shadow:var(--card-shadow);
+      gap:8px;
+    }
+    .search-box input{border:none;outline:none;width:260px;font-size:.95rem;background:transparent;}
+    .search-box input::placeholder{color:var(--muted);}
+
+    #right-controls {
+      position:absolute; top:12px; right:12px; z-index:1000; display:flex; gap:8px; align-items:center;
     }
 
-    .search-box input {
-      border: none;
-      outline: none;
-      width: 200px;
-      font-size: 0.95rem;
-      padding: 2px 0;
-    }
-
-    #download-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      font-size: 0.9rem;
-      padding: 8px 14px;
-      border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-      transition: 0.3s;
-      background-color: #28a745 !important;
-      border-color: #28a745 !important;
-    }
-
-    #download-btn:hover {
-      transform: scale(1.02);
-      opacity: 0.9;
-    }
-
-    /* 3. Legenda Styling */
+    /* legend */
     .legend {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.98);
-      padding: 14px 18px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      line-height: 1.6em;
-      z-index: 1000;
+      position:absolute; bottom:12px; right:12px; z-index:1000; background:var(--glass);
+      padding:12px 14px; border-radius:12px; width:260px; box-shadow:var(--card-shadow); font-size:.9rem;
     }
+    .legend h6{margin:0 0 8px;color:var(--brand-1);font-weight:700;}
+    .legend .row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 
-    .legend h6 {
-      margin: 0 0 8px;
-      font-weight: 700;
-      color: #0b3c91;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 5px;
-    }
+    /* gps panel */
+    #gps-panel{position:absolute; top:140px; right:12px; z-index:1000; background:white; border-radius:12px; padding:12px; width:230px; box-shadow:var(--card-shadow); font-size:13px;}
+    #follow-gps{margin-top:8px;width:100%;}
 
-    .legend i, .legend img {
-      width: 18px;
-      height: 18px;
-      float: left;
-      margin-right: 10px;
-      border-radius: 4px;
-      vertical-align: middle;
-    }
+    /* small badges */
+    .badge-small{font-size:12px;padding:6px 8px;border-radius:8px;background:rgba(11,60,145,0.06);color:var(--brand-1);}
 
-    .legend i {
-        border: 1px solid #ccc;
+    /* loading overlay */
+    #loading-overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,rgba(255,255,255,0.6),rgba(255,255,255,0.4));
+      z-index:4000;backdrop-filter: blur(2px);transition:opacity .2s;opacity:1;
     }
-    
-    /* 4. Leaflet Plugin/Popup/Tooltip Styling */
-    .leaflet-control-layers {
-      border-radius: 8px !important;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .leaflet-control-container .leaflet-control-geocoder {
-      border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    }
+    #loading-card{background:white;padding:16px 18px;border-radius:14px;box-shadow:0 20px 60px rgba(2,6,23,0.12);display:flex;gap:12px;align-items:center;}
+    .spinner {width:34px;height:34px;border-radius:50%;border:4px solid #eee;border-top-color:var(--brand-1);animation:spin 1s linear infinite;}
+    @keyframes spin {to{transform:rotate(360deg);} }
 
-    .leaflet-popup-content-wrapper {
-      border-radius: 10px;
-    }
-
-    .leaflet-tooltip {
-      background-color: #0b3c91;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Responsive untuk layar kecil */
-    @media (max-width: 600px) {
-      .search-box {
-        top: 60px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 300px;
-      }
-      .locate-btn {
-        top: 60px;
-        left: auto;
-        right: 10px;
-      }
-      #download-btn {
-        top: 12px;
-        right: 10px;
-        padding: 6px 10px;
-        font-size: 0.8rem;
-      }
-      .legend {
-        bottom: 5px;
-        right: 5px;
-        padding: 10px;
-        font-size: 0.85rem;
-      }
+    /* responsive tweaks */
+    @media(max-width:640px){
+      .search-box input{width:140px;}
+      #gps-panel{right:8px;top:110px;width:170px;font-size:12px;}
+      .legend{width:160px;padding:10px;font-size:.82rem;}
     }
   </style>
 </head>
-
 <body>
-  <h1>🗺️ Peta Sebaran Apotek di Kota Sukabumi</h1>
+  <h1>
+    <div id="app-bar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" style="width:34px;height:34px;border-radius:6px" alt="logo">
+        <span>Peta Sebaran Apotek — Kota Sukabumi</span>
+      </div>
+      <div style="font-size:.95rem;color:rgba(255,255,255,0.95);">Analisis GIS • UI Premium</div>
+    </div>
+  </h1>
 
-  <button id="locate-btn" class="locate-btn" title="Tampilkan Lokasi Saya"><i class="fas fa-location-arrow"></i></button>
-
-  <button id="download-btn" class="btn position-absolute">
-    <i class="fas fa-download"></i> Unduh Data
-  </button>
-  
-  <div class="search-box">
-    <i class="fas fa-search" style="color:#0b3c91;"></i>
-    <input type="text" id="search-apotek" placeholder="Cari apotek..." />
+  <!-- Toolbar left -->
+  <div class="toolbar" role="toolbar" aria-label="Toolbar">
+    <button id="locate-btn" class="tool-btn round-btn" title="Tampilkan Lokasi Saya (klik)"><i class="fas fa-location-arrow" aria-hidden="true"></i></button>
+    <button id="reset-view" class="tool-btn" title="Reset Tampilan Peta"><i class="fas fa-home"></i> Reset</button>
+    <button id="download-btn" class="tool-btn" title="Unduh data apotek (GeoJSON)"><i class="fas fa-download"></i> Unduh</button>
+    <button id="api-cuaca-btn" class="tool-btn" title="Muat Layer Cuaca (Open-Meteo)"><i class="fas fa-cloud"></i> Cuaca</button>
   </div>
 
-  <div id="map"></div>
+  <!-- Search -->
+  <div class="search-box" role="search" aria-label="Cari apotek">
+    <i class="fas fa-search" style="color:var(--brand-1);"></i>
+    <input type="text" id="search-apotek" placeholder="Cari apotek (ketik lalu Enter)" aria-label="Cari apotek" />
+    <span id="search-count" class="badge-small" style="display:none"></span>
+  </div>
 
-  <div class="legend">
+  <!-- Right Controls -->
+  <div id="right-controls">
+    <button id="toggle-heat" class="tool-btn" title="Toggle Heatmap"><i class="fas fa-fire"></i></button>
+    <button id="toggle-buffers" class="tool-btn" title="Toggle Buffer 500m"><i class="fas fa-circle-notch"></i></button>
+    <button id="toggle-centroid" class="tool-btn" title="Toggle Centroid"><i class="fas fa-map-pin"></i></button>
+  </div>
+
+  <div id="map" role="application" aria-label="Peta apotek"></div>
+
+  <div class="legend" aria-hidden="false">
     <h6>Legenda</h6>
-    <div><i style="background:#28a745;"></i> Area (Polygon)</div>
-    <div><i style="background:#007bff;"></i> Jalur (Polyline)</div>
-    <div><i style="background:#ffa500; border-color: #ff8c00;"></i> Buffer 500m</div>
-    <div><img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" alt="Apotek Icon"> Titik Apotek</div>
-    <div style="clear:both"></div>
-    <small style="color:#6c757d; display:block; margin-top:10px">
-      <i class="fas fa-info-circle"></i> Gunakan Layer Control (kanan atas) untuk melihat analisis.
-    </small>
+    <div class="row"><div style="width:18px;height:12px;background:#28a745;border-radius:3px"></div><div>Area (Polygon)</div></div>
+    <div class="row"><div style="width:18px;height:12px;background:#007bff;border-radius:3px"></div><div>Jalur (Polyline)</div></div>
+    <div class="row"><div style="width:18px;height:12px;background:#ffa500;border-radius:3px;border:1px solid #ff8c00"></div><div>Buffer 500m</div></div>
+    <div class="row"><img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" width="18" height="18" alt=""><div>Titik Apotek</div></div>
+    <small style="color:var(--muted);display:block;margin-top:8px"><i class="fas fa-info-circle"></i> Gunakan Layer Control (kanan atas) untuk mengaktifkan / nonaktifkan analisis.</small>
+  </div>
+
+  <div id="gps-panel" aria-live="polite">
+    <b>GPS Realtime</b><br>
+    Speed: <span id="gps-speed">-</span> km/h<br>
+    Waktu: <span id="gps-time">-</span><br>
+    Lat: <span id="gps-lat">-</span><br>
+    Lng: <span id="gps-lng">-</span>
+    <button id="follow-gps" class="btn btn-sm btn-primary" style="margin-top:8px">Follow GPS: OFF</button>
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" aria-hidden="false">
+    <div id="loading-card">
+      <div class="spinner" role="status" aria-hidden="true"></div>
+      <div>
+        <div style="font-weight:700;color:var(--brand-1);">Memuat peta & data…</div>
+        <div style="font-size:.9rem;color:var(--muted);">Mengecek file <code>map.geojson</code> dan inisialisasi layer</div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Inisialisasi peta
-    var map = L.map("map").setView([-6.919, 106.926], 14);
+    /* =========================
+       Helper utilities
+       ========================= */
+    function $(id){return document.getElementById(id);}
+    function sleep(ms){return new Promise(res=>setTimeout(res,ms));}
 
-    // Base maps
-    var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: "© OpenStreetMap contributors"
-    }).addTo(map);
+    // Debounce helper
+    function debounce(fn, delay){let t; return function(...args){clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), delay);};}
 
-    var satellite = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      { attribution: "Tiles © Esri" }
-    );
+    // Simple notifier (non-blocking)
+    function notify(msg, type='info', ttl=2800){
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position='fixed';
+      el.style.right='12px';
+      el.style.bottom=(20 + (notify._count||0)*56)+'px';
+      el.style.background = type==='error' ? '#ffdddd' : '#ffffff';
+      el.style.color = type==='error' ? '#a10000' : 'var(--brand-1)';
+      el.style.border = '1px solid rgba(11,60,145,0.06)';
+      el.style.padding='10px 12px';
+      el.style.borderRadius='10px';
+      el.style.boxShadow='0 12px 40px rgba(2,6,23,0.08)';
+      el.style.zIndex=5000;
+      document.body.appendChild(el);
+      notify._count = (notify._count||0) + 1;
+      setTimeout(()=>{ el.style.opacity='0'; el.remove(); notify._count--; }, ttl);
+    }
 
-    var topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-      maxZoom: 17,
-      attribution: "© OpenTopoMap contributors"
-    });
+    /* =========================
+       Map init & layers
+       ========================= */
+    var map = L.map('map', { zoomControl:true }).setView([-6.919, 106.926], 14);
 
-    // Layer groups (Original)
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap contributors' }).addTo(map);
+    var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Tiles © Esri' });
+    var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom:17, attribution:'© OpenTopoMap contributors' });
+
+    // Layers
     var polylineLayer = L.layerGroup();
     var polygonLayer = L.layerGroup();
-
-    // LAYER GROUP BARU: Marker Clustering (Pengelompokan Penanda)
-    var clusterLayer = L.markerClusterGroup({
-        spiderfyOnMaxZoom: false,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true
-    });
-
-    // LAYER GROUP BARU: Buffer Area Per Apotek (Analisis Kedekatan)
+    var clusterLayer = L.markerClusterGroup({ spiderfyOnMaxZoom:false, showCoverageOnHover:false, zoomToBoundsOnClick:true });
     var individualBufferLayer = L.layerGroup();
-
-    // Layer groups (Analysis)
-    var heatLayer = null;
+    var weatherLayer = L.layerGroup();
+    var apiLayer = L.layerGroup();
     var centroidLayer = L.layerGroup();
     var serviceAreaLayer = L.layerGroup();
     var densityZoneLayer = L.layerGroup();
+    var heatLayer = null;
 
-    // Icon apotek
-    var apotekIcon = L.icon({
-      iconUrl: "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
-      iconSize: [30, 30],
-      iconAnchor: [15, 30],
-      popupAnchor: [0, -28]
-    });
+    // icons
+    var apotekIcon = L.icon({ iconUrl:'https://cdn-icons-png.flaticon.com/512/2966/2966327.png', iconSize:[30,30], iconAnchor:[15,30], popupAnchor:[0,-26] });
+    var gpsIcon = L.icon({ iconUrl:'https://cdn-icons-png.flaticon.com/512/684/684908.png', iconSize:[40,40], iconAnchor:[20,40] });
 
     var apotekData = []; // { name, layer }
+    var geojsonObject = null;
 
-    // Muat GeoJSON (nama file: map.geojson)
-    fetch("map.geojson")
-      .then(res => res.json())
-      .then(data => {
+    // track UI state
+    var showHeat = true;
+    var showBuffers = true;
+    var showCentroid = true;
+
+    // set initial control on map only after data loaded
+    var layersControl = null;
+
+    // loading overlay control
+    function hideLoading(){ const o=$('loading-overlay'); if(o) o.style.opacity=0; setTimeout(()=>{ if(o) o.style.display='none'; },400); }
+    function showLoading(){ const o=$('loading-overlay'); if(o){ o.style.display='flex'; o.style.opacity=1; } }
+
+    /* =========================
+       Weather (rate-limited)
+       ========================= */
+    // We'll throttle to 1 request per 250ms to avoid Open-Meteo abuse.
+    async function getWeather(lat, lon){
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FJakarta`;
+      try {
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const j = await res.json();
+        return j.current_weather || null;
+      } catch(e){
+        console.warn('getWeather err', e);
+        return null;
+      }
+    }
+    function makeWeatherIcon(tempC){
+      const color = tempC >= 30 ? "#ff5722" : tempC >= 25 ? "#ff9800" : "#4fc3f7";
+      const html = `<div style="background:${color};color:#fff;border-radius:6px;padding:2px 6px;font-size:12px;font-weight:700;">${Math.round(tempC)}°C</div>`;
+      return L.divIcon({ html, className:"weather-divicon", iconSize:[46,18], iconAnchor:[23,-10] });
+    }
+    function getWeatherText(code){
+      const icons = {
+        0:"☀️ Cerah",1:"🌤️ Mostly Clear",2:"⛅ Berawan",3:"☁️ Mendung",
+        45:"🌫️ Kabut",48:"🌫️ Kabut Beku",51:"🌦️ Gerimis Ringan",53:"🌧️ Gerimis Sedang",
+        55:"🌧️ Gerimis Lebat",61:"🌦️ Hujan Ringan",63:"🌧️ Hujan Sedang",65:"🌧️ Hujan Lebat",
+        71:"❄️ Salju Ringan",80:"🌦️ Hujan Lokal",95:"⛈️ Badai Petir"
+      };
+      return icons[code]||"❔ Tidak diketahui";
+    }
+
+    // Add weather markers for all apotekData (rate-limited)
+    async function addWeatherLayer(){
+      if(!apotekData || apotekData.length===0){ notify('Data apotek belum siap. Tunggu sejenak.', 'error'); return; }
+      weatherLayer.clearLayers();
+      // process in sequence with small delay
+      for(let i=0;i<apotekData.length;i++){
+        const item = apotekData[i];
+        if(!item.layer || !item.layer.getLatLng) continue;
+        const latlng = item.layer.getLatLng();
+        const w = await getWeather(latlng.lat, latlng.lng);
+        if(!w) continue;
+        const wIcon = makeWeatherIcon(w.temperature);
+        const m = L.marker([latlng.lat + 0.00008, latlng.lng], { icon: wIcon });
+        const popupHtml = `<div style="font-size:13px"><b>Cuaca</b><br>${item.name}<br>Suhu: <b>${w.temperature} °C</b><br>Angin: <b>${w.windspeed} m/s</b><br>Waktu: ${w.time}</div>`;
+        m.bindPopup(popupHtml);
+        weatherLayer.addLayer(m);
+
+        const emoji = getWeatherText(w.weathercode).split(" ")[0] || "❔";
+        const emojiMarker = L.marker([latlng.lat + 0.00024, latlng.lng], { icon: L.divIcon({ html:`<div style="font-size:18px">${emoji}</div>`, className:'cuaca-emoji' }) });
+        weatherLayer.addLayer(emojiMarker);
+
+        // small throttle
+        await sleep(220);
+      }
+      if(!map.hasLayer(weatherLayer)) weatherLayer.addTo(map);
+      notify('Layer cuaca dimuat. Gunakan Layer Control untuk on/off.');
+    }
+
+    // Toggle helpers
+    $('api-cuaca-btn').addEventListener('click', () => { addWeatherLayer(); });
+
+    /* =========================
+       Load GeoJSON & setup
+       ========================= */
+    async function loadGeoJSON(){
+      try {
+        // fetch map.geojson
+        const res = await fetch('map.geojson', { cache: 'no-store' });
+        if(!res.ok) throw new Error('Tidak dapat mengambil map.geojson (HTTP ' + res.status + ')');
+        const data = await res.json();
+        geojsonObject = data;
+
+        // build geojson
         const geojson = L.geoJSON(data, {
           pointToLayer: (feature, latlng) => {
-            // 1. BUAT MARKER
             const marker = L.marker(latlng, { icon: apotekIcon });
-
-            // 2. BUAT BUFFER 500m UNTUK SETIAP APOTEK
-            L.circle(latlng, {
-                radius: 500, // 500 meter
-                color: '#ff8c00', 
-                fillColor: '#ffa500',
-                fillOpacity: 0.15,
-                weight: 1 
-            })
-            .bindPopup(`Area Layanan 500m: <b>${feature.properties.Nama || 'Apotek'}</b>`)
-            .addTo(individualBufferLayer);
-
+            // buffer per titik
+            L.circle(latlng, { radius:500, color:'#ff8c00', fillColor:'#ffa500', fillOpacity:0.12, weight:1 })
+              .bindPopup(`Area Layanan 500m: <b>${feature.properties.Nama || 'Apotek'}</b>`)
+              .addTo(individualBufferLayer);
             return marker;
           },
           style: feature => {
-            if (feature.geometry.type === "LineString")
-              return { color: "#007bff", weight: 3, dashArray: "5, 5" };
-            if (feature.geometry.type === "Polygon")
-              return { color: "#28a745", fillOpacity: 0.4, weight: 1.5 };
+            if (feature.geometry.type === "LineString") return { color:"#007bff", weight:3, dashArray:"5,5" };
+            if (feature.geometry.type === "Polygon") return { color:"#28a745", fillOpacity:0.35, weight:1.5 };
           },
           onEachFeature: (feature, layer) => {
-            const nama = feature.properties["Nama"] || feature.properties["Nama "] || "Apotek";
-            layer.bindTooltip(nama, { direction: "top", offset: [0, -15] });
+            const nama = (feature.properties && (feature.properties.Nama || feature.properties['Nama '] )) || 'Apotek';
+            layer.bindTooltip(nama, { direction:'top', offset:[0,-15] });
 
             if (feature.geometry.type === "Point") {
               const latlng = layer.getLatLng();
               layer.bindPopup(`
-                <div style="text-align:center; line-height:1.4;">
-                  <h6 style="margin-bottom:5px;color:#0b3c91;font-weight:600">${nama}</h6>
-                  <p style="margin:2px 0;"><b>Alamat:</b> ${feature.properties.Alamat || "Tidak tersedia"}</p>
-                  <p style="margin:2px 0;"><b>Jam Buka:</b> ${feature.properties.Jam || "Tidak diketahui"}</p>
-                  <small style="color:#6c757d"><b>Koordinat:</b><br>${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}</small>
+                <div style="text-align:center;line-height:1.4;">
+                  <h6 style="margin-bottom:6px;color:var(--brand-1);font-weight:600">${nama}</h6>
+                  <p style="margin:2px 0;"><b>Alamat:</b> ${feature.properties.Alamat || 'Tidak tersedia'}</p>
+                  <p style="margin:2px 0;"><b>Jam:</b> ${feature.properties.Jam || 'Tidak diketahui'}</p>
+                  <small style="color:var(--muted)"><b>Koordinat:</b><br>${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}</small>
                 </div>
               `);
-              
-              // Tambah marker ke Cluster Layer
               clusterLayer.addLayer(layer);
               apotekData.push({ name: nama.toLowerCase(), layer });
             }
             if (feature.geometry.type === "LineString") polylineLayer.addLayer(layer);
             if (feature.geometry.type === "Polygon") polygonLayer.addLayer(layer);
 
-            // Efek highlight saat hover
             layer.on({
-              mouseover: e => {
-                try {
-                  e.target.setStyle && e.target.setStyle({ weight: 4, color: "#FFD700", fillOpacity: 0.7 });
-                } catch (err) {}
-              },
-              mouseout: e => {
-                try { geojson.resetStyle && geojson.resetStyle(e.target); } catch (err) {}
-              }
+              mouseover: e => { try { e.target.setStyle && e.target.setStyle({ weight:4, color:'#FFD700', fillOpacity:0.7 }); } catch(err){} },
+              mouseout: e => { try { geojson.resetStyle && geojson.resetStyle(e.target); } catch(err){} }
             });
           }
         });
 
-        // Tambahkan layer utama ke peta
+        // add initial layers
         clusterLayer.addTo(map);
         polylineLayer.addTo(map);
         polygonLayer.addTo(map);
+        individualBufferLayer.addTo(map);
 
-        // -------------------------
-        // ANALISIS (dijalankan setelah data dimuat)
-        // -------------------------
+        // analyses
         setTimeout(() => {
           const markerPoints = [];
-          clusterLayer.eachLayer(m => { // Ambil data dari clusterLayer
-            if (m.getLatLng) markerPoints.push(m.getLatLng());
-          });
+          clusterLayer.eachLayer(m => { if(m.getLatLng) markerPoints.push(m.getLatLng()); });
 
-          if (markerPoints.length > 0) {
-            // 1) Heatmap
-            const heatPoints = markerPoints.map(p => [p.lat, p.lng, 0.7]);
-            heatLayer = L.heatLayer(heatPoints, { radius: 30, blur: 20, maxZoom: 15 });
+          if(markerPoints.length>0){
+            const heatPoints = markerPoints.map(p=>[p.lat,p.lng,0.7]);
+            heatLayer = L.heatLayer(heatPoints, { radius:30, blur:20, maxZoom:15 });
+            if(showHeat) heatLayer.addTo(map);
 
-            // 2) Centroid (Pusat Kepadatan)
-            let sumLat = 0, sumLng = 0;
-            markerPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-            const centroid = { lat: sumLat / markerPoints.length, lng: sumLng / markerPoints.length };
+            let sumLat=0,sumLng=0;
+            markerPoints.forEach(p=>{ sumLat+=p.lat; sumLng+=p.lng; });
+            const centroid = { lat: sumLat/markerPoints.length, lng: sumLng/markerPoints.length };
 
-            const centroidIcon = L.icon({
-              iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
-              iconSize: [32, 32],
-              iconAnchor: [16, 32]
-            });
-            L.marker([centroid.lat, centroid.lng], { icon: centroidIcon })
-              .bindPopup(`<b>Pusat Kepadatan Apotek</b><br>${centroid.lat.toFixed(6)}, ${centroid.lng.toFixed(6)}`).addTo(centroidLayer);
+            const centroidIcon = L.icon({ iconUrl:'https://cdn-icons-png.flaticon.com/512/854/854878.png', iconSize:[32,32], iconAnchor:[16,32] });
+            L.marker([centroid.lat, centroid.lng], { icon: centroidIcon }).bindPopup(`<b>Pusat Kepadatan Apotek</b><br>${centroid.lat.toFixed(6)}, ${centroid.lng.toFixed(6)}`).addTo(centroidLayer);
 
-            // 3) Service area 1 km (di sekitar Centroid)
-            L.circle([centroid.lat, centroid.lng], {
-              radius: 1000,
-              color: "#00c853",
-              fillColor: "#69f0ae",
-              fillOpacity: 0.2
-            }).bindPopup("Radius 1 km dari pusat kepadatan").addTo(serviceAreaLayer);
+            L.circle([centroid.lat, centroid.lng], { radius:1000, color:'#00c853', fillColor:'#69f0ae', fillOpacity:0.2 }).bindPopup('Radius 1 km dari pusat kepadatan').addTo(serviceAreaLayer);
 
-            // 4) Zona Kepadatan
             const zoneSize = 0.004;
             L.polygon([
               [centroid.lat + zoneSize, centroid.lng - zoneSize],
               [centroid.lat + zoneSize, centroid.lng + zoneSize],
               [centroid.lat - zoneSize, centroid.lng + zoneSize],
               [centroid.lat - zoneSize, centroid.lng - zoneSize]
-            ], {
-              color: "#d50000",
-              fillColor: "#ff1744",
-              fillOpacity: 0.3
-            }).bindPopup("<b>Zona Kepadatan (automatis)</b>").addTo(densityZoneLayer);
+            ], { color:'#d50000', fillColor:'#ff1744', fillOpacity:0.3 }).bindPopup('<b>Zona Kepadatan (automatis)</b>').addTo(densityZoneLayer);
 
-            // Tampilkan Heatmap by default
-            heatLayer.addTo(map);
+            if(showCentroid) centroidLayer.addTo(map);
+            serviceAreaLayer.addTo(map);
+            densityZoneLayer.addTo(map);
           }
 
-          // -------------
-          // LAYER CONTROL
-          // -------------
-          var baseMaps = {
-            "🌍 OpenStreetMap": osm,
-            "🛰️ Satellite (ESRI)": satellite,
-            "⛰️ Topographic": topo
-          };
-
+          var baseMaps = { "🌍 OpenStreetMap": osm, "🛰️ Satellite (ESRI)": satellite, "⛰️ Topographic": topo };
           var overlays = {
             "🏥 Titik Apotek (Clustered)": clusterLayer,
             "🛣️ Jalur": polylineLayer,
-            "🗺️ Area (Polygon)": polygonLayer
+            "🗺️ Area (Polygon)": polygonLayer,
+            "🟠 Buffer 500m (Per Apotek)": individualBufferLayer,
+            "🌤️ Layer Cuaca (Open-Meteo)": weatherLayer,
+            "🌐 Data API Lokasi (Reverse)": apiLayer,
+            "📌 Centroid Apotek": centroidLayer,
+            "🟢 Service Area 1 km (Centroid)": serviceAreaLayer,
+            "🟥 Zona Kepadatan (Centroid)": densityZoneLayer
           };
+          if(heatLayer) overlays["🔥 Heatmap Kepadatan"] = heatLayer;
 
-          // Analisis
-          if (individualBufferLayer) overlays["🟠 Buffer 500m (Per Apotek)"] = individualBufferLayer;
-          if (heatLayer) overlays["🔥 Heatmap Kepadatan (On)"] = heatLayer;
-          if (centroidLayer) overlays["📌 Centroid Apotek"] = centroidLayer;
-          if (serviceAreaLayer) overlays["🟢 Service Area 1 km (Centroid)"] = serviceAreaLayer;
-          if (densityZoneLayer) overlays["🟥 Zona Kepadatan (Centroid)"] = densityZoneLayer;
-
-          L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(map);
-        }, 300);
-
-        // Add geocoder
-        L.Control.geocoder({
-          defaultMarkGeocode: false,
-          placeholder: "Cari lokasi di peta..."
-        })
-        .on("markgeocode", function(e) {
-          map.fitBounds(e.geocode.bbox);
-        })
-        .addTo(map);
-
-      })
-      .catch(err => console.error("Gagal memuat GeoJSON:", err));
-
-    // Pencarian apotek lokal (search box)
-    document.getElementById("search-apotek").addEventListener("keyup", function (e) {
-      const query = e.target.value.toLowerCase().trim();
-      if (!query) return;
-      const found = apotekData.find(a => a.name.includes(query));
-      if (found) {
-        map.setView(found.layer.getLatLng(), 17);
-        found.layer.openPopup();
+          layersControl = L.control.layers(baseMaps, overlays, { collapsed:false }).addTo(map);
+          hideLoading();
+        }, 250);
+        notify('GeoJSON berhasil dimuat.', 'info', 1800);
+      } catch(e){
+        console.error('Gagal memuat GeoJSON', e);
+        hideLoading();
+        notify('Gagal memuat map.geojson. Pastikan file ada di folder yang sama.', 'error', 4500);
+        // still allow small UI operations (map present)
       }
+    }
+
+    // load right away
+    loadGeoJSON();
+
+    /* =========================
+       Search box (debounced)
+       ========================= */
+    const searchInput = $('search-apotek');
+    const searchCount = $('search-count');
+
+    const doSearch = debounce(function(){
+      const q = searchInput.value.trim().toLowerCase();
+      if(!q){ searchCount.style.display='none'; return; }
+      const matches = apotekData.filter(a => a.name.includes(q));
+      searchCount.style.display='inline-block';
+      searchCount.textContent = `${matches.length} hasil`;
+      if(matches.length>0){
+        const found = matches[0];
+        map.setView(found.layer.getLatLng(), 17, { animate:true });
+        found.layer.openPopup();
+      } else {
+        notify('Tidak ditemukan apotek yang cocok.', 'info', 1600);
+      }
+    }, 350);
+
+    searchInput.addEventListener('keyup', function(e){
+      if(e.key === 'Enter') doSearch();
+      else doSearch();
     });
 
-    // Tombol geolokasi pengguna
-    document.getElementById("locate-btn").addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        alert("Browser tidak mendukung geolokasi!");
+    /* =========================
+       Download GeoJSON
+       ========================= */
+    $('download-btn').addEventListener('click', () => {
+      fetch('map.geojson').then(r => {
+        if(!r.ok) throw new Error('Gagal mengunduh (HTTP ' + r.status + ')');
+        return r.blob();
+      }).then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'data_apotek_sukabumi.geojson'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        notify('Unduhan dimulai', 'info', 1500);
+      }).catch(err => { console.error(err); notify('Gagal mengunduh file GeoJSON.', 'error', 3000); });
+    });
+
+    /* =========================
+       GPS realtime (watchPosition) with fallback to IP
+       ========================= */
+    let gpsMarker = null;
+    let gpsHistory = [];
+    let gpsPolyline = L.polyline([], { color:'red', weight:3 }).addTo(map);
+    let followGPS = false;
+    const followBtn = $('follow-gps');
+
+    followBtn.addEventListener('click', () => {
+      followGPS = !followGPS;
+      followBtn.textContent = 'Follow GPS: ' + (followGPS ? 'ON' : 'OFF');
+      followBtn.classList.toggle('active', followGPS);
+      if(followGPS && gpsMarker) map.panTo(gpsMarker.getLatLng());
+    });
+
+    function updateGPSPanel(data){
+      $('gps-speed').textContent = data.speed !== undefined ? data.speed : '-';
+      $('gps-time').textContent = data.time || '-';
+      $('gps-lat').textContent = (data.lat||0).toFixed ? data.lat.toFixed(6) : '-';
+      $('gps-lng').textContent = (data.lng||0).toFixed ? data.lng.toFixed(6) : '-';
+    }
+
+    let watchId = null;
+    let ipFallbackDone = false;
+
+    function startWatchPosition(){
+      if(!navigator.geolocation){
+        fallbackToIP('Browser tidak mendukung geolocation.');
         return;
       }
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const { latitude, longitude } = pos.coords;
-          const userIcon = L.icon({
-            iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
-            iconSize: [28, 28],
-            iconAnchor: [14, 28],
-          });
-          const userMarker = L.marker([latitude, longitude], { icon: userIcon }).addTo(map);
-          userMarker.bindPopup("<b>Lokasi Anda Saat Ini</b>").openPopup();
-          map.setView([latitude, longitude], 16);
-        },
-        err => alert("Tidak dapat mengambil lokasi: " + err.message)
-      );
-    });
+      if(watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-    // Tombol download GeoJSON
-    document.getElementById("download-btn").addEventListener("click", () => {
-      fetch("map.geojson")
-        .then(res => res.blob())
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "data_apotek_sukabumi.geojson";
-          a.click();
-          URL.revokeObjectURL(url);
+      try {
+        watchId = navigator.geolocation.watchPosition(positionSuccess, positionError, {
+          enableHighAccuracy: true,
+          maximumAge: 2000,
+          timeout: 15000
         });
+      } catch(e){
+        console.warn('watchPosition failed', e);
+        fallbackToIP('Gagal memulai watchPosition.');
+      }
+    }
+
+    async function positionSuccess(pos){
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const speed = pos.coords.speed != null ? (pos.coords.speed * 3.6).toFixed(1) : '-';
+      const timestamp = new Date(pos.timestamp).toLocaleTimeString();
+
+      if(!gpsMarker){
+        gpsMarker = L.marker([lat,lng], { icon: gpsIcon }).addTo(map);
+      } else gpsMarker.setLatLng([lat,lng]);
+
+      gpsHistory.push([lat,lng]);
+      // keep last 500 points only
+      if(gpsHistory.length > 500) gpsHistory.shift();
+      gpsPolyline.setLatLngs(gpsHistory);
+
+      updateGPSPanel({ lat, lng, speed, time: timestamp });
+
+      if(followGPS){
+        // smooth pan
+        map.panTo([lat,lng], { animate:true, duration:0.6 });
+      }
+    }
+
+    function positionError(err){
+      console.warn('Geolocation error:', err);
+      if(err && err.code === 1){
+        // PERMISSION_DENIED
+        notify('Akses lokasi ditolak. Gunakan tombol lokasi/periksa izin browser.', 'error', 4000);
+      } else {
+        notify('Gagal mendapatkan lokasi via GPS. Mencoba perkiraan berdasarkan IP.', 'error', 3800);
+      }
+      fallbackToIP('Gagal mengambil lokasi: ' + (err && err.message ? err.message : 'unknown'));
+    }
+
+    // IP fallback using ipapi.co (CORS friendly)
+    function fallbackToIP(msg){
+      if(ipFallbackDone) return;
+      ipFallbackDone = true;
+      console.warn('Fallback to IP:', msg);
+      fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
+        const lat = parseFloat(d.latitude || d.lat || -6.919);
+        const lng = parseFloat(d.longitude || d.lon || 106.926);
+        if(!gpsMarker){
+          gpsMarker = L.marker([lat,lng], { icon: gpsIcon }).addTo(map);
+        } else gpsMarker.setLatLng([lat,lng]);
+        gpsHistory.push([lat,lng]); gpsPolyline.setLatLngs(gpsHistory);
+        updateGPSPanel({ lat, lng, speed: '-', time: new Date().toLocaleTimeString() });
+        map.panTo([lat,lng]);
+        notify('Menggunakan lokasi perkiraan berdasarkan IP. Untuk akurasi lebih baik izinkan akses lokasi.', 'info', 4500);
+      }).catch(e=>{
+        console.warn('IP fallback failed', e);
+        notify('Gagal mendapatkan lokasi (GPS & IP). Periksa pengaturan browser / perangkat.', 'error', 4500);
+      });
+    }
+
+    // locate button (one-time) + ensure watch started
+    $('locate-btn').addEventListener('click', () => {
+      if(!navigator.geolocation){ fallbackToIP('Browser tidak mendukung geolocation.'); return; }
+      navigator.geolocation.getCurrentPosition(pos=>{
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        if(!gpsMarker) gpsMarker = L.marker([lat,lng], { icon: gpsIcon }).addTo(map);
+        else gpsMarker.setLatLng([lat,lng]);
+        gpsHistory.push([lat,lng]); gpsPolyline.setLatLngs(gpsHistory);
+        updateGPSPanel({ lat, lng, speed: pos.coords.speed != null ? (pos.coords.speed*3.6).toFixed(1) : '-', time: new Date(pos.timestamp).toLocaleTimeString() });
+        map.setView([lat,lng], 16);
+        startWatchPosition();
+      }, err => {
+        positionError(err);
+      }, { enableHighAccuracy:true, timeout:12000, maximumAge:0 });
     });
 
-    // Skala & klik koordinat
-    L.control.scale({ position: 'bottomleft' }).addTo(map);
-    map.on('click', function(e) {
-      L.popup()
-        .setLatLng(e.latlng)
-        .setContent("📍 Koordinat: " + e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5))
-        .openOn(map);
+    // start watch on load
+    startWatchPosition();
+
+    // cleanup watch on unload
+    window.addEventListener('beforeunload', () => { if(watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(watchId); });
+
+    /* =========================
+       UI toggles and extras
+       ========================= */
+    $('reset-view').addEventListener('click', () => { map.setView([-6.919,106.926], 14); notify('Tampilan peta di-reset.'); });
+
+    $('toggle-heat').addEventListener('click', () => {
+      if(!heatLayer) return notify('Heatmap belum tersedia.', 'info');
+      showHeat = !showHeat;
+      if(showHeat) map.addLayer(heatLayer); else map.removeLayer(heatLayer);
     });
+
+    $('toggle-buffers').addEventListener('click', () => {
+      showBuffers = !showBuffers;
+      if(showBuffers) map.addLayer(individualBufferLayer); else map.removeLayer(individualBufferLayer);
+    });
+
+    $('toggle-centroid').addEventListener('click', () => {
+      showCentroid = !showCentroid;
+      if(showCentroid) map.addLayer(centroidLayer); else map.removeLayer(centroidLayer);
+    });
+
+    /* Final: hide loading after 8s as fail-safe */
+    setTimeout(()=>{ hideLoading(); }, 8000);
+
+    // Accessibility: add keyboard shortcut "L" to locate
+    document.addEventListener('keydown', (e) => { if(e.key.toLowerCase() === 'l'){ $('locate-btn').click(); } });
+
   </script>
 </body>
 </html>
